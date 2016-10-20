@@ -2,14 +2,15 @@ require([], function (){
 
     var isMobileInit = false;
     var loadMobile = function(){
-        require([yiliaConfig.rootUrl + 'js/mobile.js'], function(mobile){
+        require(['/js/mobile.js'], function(mobile){
             mobile.init();
+          
             isMobileInit = true;
         });
     }
     var isPCInit = false;
     var loadPC = function(){
-        require([yiliaConfig.rootUrl + 'js/pc.js'], function(pc){
+        require(['/js/pc.js'], function(pc){
             pc.init();
             isPCInit = true;
         });
@@ -55,7 +56,7 @@ require([], function (){
 
     //是否使用fancybox
     if(yiliaConfig.fancybox === true){
-        require([yiliaConfig.rootUrl + 'fancybox/jquery.fancybox.js'], function(pc){
+        require(['/fancybox/jquery.fancybox.js'], function(pc){
             var isFancy = $(".isFancy");
             if(isFancy.length != 0){
                 var imgArr = $(".article-inner img");
@@ -72,7 +73,7 @@ require([], function (){
     //是否开启动画
     if(yiliaConfig.animate === true){
 
-        require([yiliaConfig.rootUrl + 'js/jquery.lazyload.js'], function(){
+        require(['/js/jquery.lazyload.js'], function(){
             //avatar
             $(".js-avatar").attr("src", $(".js-avatar").attr("lazy-src"));
             $(".js-avatar")[0].onload = function(){
@@ -85,7 +86,7 @@ require([], function (){
         // https://github.com/jlmakes/scrollreveal.js
         // 使用cdn[//cdn.bootcss.com/scrollReveal.js/3.0.5/scrollreveal.js]
         require([
-          '//cdn.bootcss.com/scrollReveal.js/3.0.5/scrollreveal.js'
+          '/js/other/scrollreveal.js'
         ], function (ScrollReveal) {
           // 更多animation:
           // http://daneden.github.io/animate.css/
@@ -136,9 +137,17 @@ require([], function (){
 
     }
 
+
+
     //是否新窗口打开链接
     if(yiliaConfig.open_in_new == true){
         $(".article a[href]").attr("target", "_blank")
     }
     $(".archive-article-title").attr("target", "_blank");
 });
+
+    if($(".instagram").length) {
+        require(['/js/photo.js', '/fancybox/jquery.fancybox.js', '/js/jquery.lazyload.js'], function(obj) {
+            obj.init();
+        });
+    }

@@ -16,11 +16,11 @@ function checkMobile() {
 //管理员判断开始
 function sskadmin(e) {
     var ssk = '';
-    if (e.user_id == 6225154084773561090) {
+    if (e.user_id == 6289591305811002114) {
         if (checkMobile()) {
-            ssk = '<span class="ua"><span class="sskadmin">Captain</span></span><br><br>';
+            ssk = '<span class="ua"><span class="sskadmin">博主</span></span><br><br>';
         } else {
-            ssk = '<span class="ua"><span class="sskadmin">Captain</span></span>';
+            ssk = '<span class="ua"><span class="sskadmin">博主</span></span>';
         }
     } else {
         if (checkMobile()) {
@@ -249,7 +249,7 @@ function os(e) {
         libs: {
             jQuery: b + "/libs/embed.compat.js?24f8ca3f.js",
             smilies: b + "/libs/smilies.js?921e8eda.js",
-            mzadxN: "http://js.miaozhen.com/mz_ad_serving.js"
+            mzadxN: "/js/other/mz_ad_serving.js"
         },
         sourceName: {
             weibo: "\u65b0\u6d6a\u5fae\u535a",
@@ -556,7 +556,7 @@ function os(e) {
     D = function(t) {
         if (! ("WebSocket" in e && i)) return ! 1;
         _.push(i.stringify(t)),
-        M || (M = w.webSocket = new WebSocket("ws://ws.duoshuo.com:8201/"), M.onopen = function() {
+        M || (M = w.webSocket = new WebSocket("wss://ws.duoshuo.com:8202/"), M.onopen = function() {
             var e;
             if (M.readyState === 1) while (e = _.shift()) M.send(e)
         },
@@ -639,7 +639,13 @@ function os(e) {
         userUrl: function(e) {
             return e.url
         },
+		
         avatarUrl: function(e, t) {
+ if (e.avatar_url) {
+    e.avatar_url = e.avatar_url.replace(/^http\:\/\//, "https://");
+  } else {
+    nt.data.default_avatar_url = '/img/default_avatar.png';
+  }
             return e.avatar_url || nt.data.default_avatar_url
         },
         userAnchor: function(e) {
@@ -1550,6 +1556,7 @@ function os(e) {
             return t + '</ul><div class="ds-smilies-container"></div></div>'
         },
         w.addSmilies = function(e, t) {
+			  if(e !== '') return;
             var n = w.smiliesTooltip;
             n && n.el.find("ul.ds-smilies-tabs").append("<li><a>" + e + "</a></li>"),
             w.smilies[e] = t
