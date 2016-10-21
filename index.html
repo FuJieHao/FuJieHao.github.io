@@ -252,7 +252,8 @@
 
 <h2 id="从大众点评的团购界面说起"><a href="#从大众点评的团购界面说起" class="headerlink" title="从大众点评的团购界面说起"></a>从大众点评的团购界面说起</h2><font size="2">这里用的网址是： ‘<a href="http://m.dianping.com/tuan/deal/5501525" target="_blank" rel="external">http://m.dianping.com/tuan/deal/5501525</a>‘</font><br><font size="2">长这个样子</font>
 
-<p><img src="Img/1.png" alt=""><br><img src="Img/2.png" alt=""></p>
+<!--![](Img/1.png)-->
+<!--![](Img/2.png)-->
 <font size="3"> 需求是这样子的：网页上面的导航条，底部的APP下单返积分，还有页面的底部的长条要去掉。还有就是头部的大图片要跳转到iOS的控制器</font>
 
 <h3 id="在viewDidload加载webView"><a href="#在viewDidload加载webView" class="headerlink" title="在viewDidload加载webView"></a>在viewDidload加载webView</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">self.webView.delegate = self;</div><div class="line"></div><div class="line">// 加载网页数据</div><div class="line">NSURL *URL = [NSURL URLWithString:@&quot;http://m.dianping.com/tuan/deal/5501525&quot;];</div><div class="line">NSURLRequest *request = [NSURLRequest requestWithURL:URL];</div><div class="line">[self.webView loadRequest:request];</div></pre></td></tr></table></figure>
