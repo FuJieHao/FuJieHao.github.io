@@ -252,7 +252,46 @@
     <div class="article-entry" itemprop="articleBody">
       
           
-        <font size="2">JS与OC为什么要交互？iOS开发为什么要用前端的东西？JS与OC的交互在哪里用得到？</font><br><font size="1">先回答这三个问题：为什么要交互，因为首先来说的话，我们的应用开发完成上架以后，过一段时间，就可能有所变化了什么的，如果是纯OC/Swift的话，那么我们的变化就需要版本更新，重新上架，审核……比较麻烦，而且有的时候，仅仅是一丁点的改动。而如果我们加载网页的话，如果同一个网页里的内容发生了变化，我们的版本不需要更新，就会达到相应的效果，这也是现在苹果应用里面不少使用前端的原因。既然这样的话，那么网页又不能原封不动的嵌入到应用里，因为你通过浏览器浏览的话，他最起码有导航栏什么什么的，但是你的应用已经有，或者不需要有某些元素，我们就需要删掉，那么的话，就涉及到了交互。话又说回来，在哪里用到的交互比较多？电商类应用，因为商品的详情会频繁变动，所以这部分就需要使用网页，从应用的角度看就是二级页面。（一级页面是用OC/Swift在做）</font>
+        <font size="2">谈及网络安全，我想不少蓝孩子都会或多或少感点兴趣，黑客不就干这个的。。<br>               不错嘛，年轻人，很有想法。不过，这里要讲的用户信息加密跟那个比，有点小儿科。哈哈……</font>
+
+<p><font size="2">不过话说，啥玩意儿需要加密，登录，注册，巴拉巴拉的……(⊙v⊙)嗯，让本屌丝概括一下，一般POST请求请求体里的东西都需要加密，GET请求暴漏在外面最多有闲的无聊的写个爬虫截取一下，只有POST请求体里才是有营养的</font></p>
+<blockquote>
+<p>粗略的说下加密怎么搞：</p>
+</blockquote>
+<pre><code>总体来说：就是客户端和服务器端使用相同的加密算法，由服务器端指定加密算法；服务器保存密码的暗文，也就是服务器匹配的是暗文。这样就可以防止数据在传输的过程中，被抓包破解，因为加密后的东西，抓到也看不懂。
+那么：什么时候要加密
+    1.密码在网络中传输之前要加密
+    2.密码在保存到本地之前要加密
+    什么时候需要解密
+    密码在从本地读取出来之后要解密
+</code></pre><blockquote>
+<p>先用最基本的base64演示一下（当然真实开发中，没人用），因为太简单了</p>
+</blockquote>
+<pre><code>这里不谈这个数据是如何加密的，这个可以百度的到，而且并不复杂。对于移动端人员来说，我们首要知道的是这个过程是怎么样的（也就是传说中的业务逻辑）
+（如果启用保存账号密码）首先程序启动的时候，就要读取用户的信息。不管是keyChain还是NSUserDefaults都可以的。
+然后如果为空的话，我就要手动输入，如果不为空的话，就要解密出来显示（那些个黑点点）
+然后登陆的时候，我把文本框里的密码加密，然后和用户名一起通过POST请求一道发送给服务器。
+之前在注册的时候，服务器拿到密码的暗文，然后这时将暗文进行匹配，如果均相同，则登陆成功，否则登陆失败
+</code></pre><h3 id="然后挂点代码"><a href="#然后挂点代码" class="headerlink" title="然后挂点代码"></a>然后挂点代码</h3><blockquote>
+<pre><code>读取和保存用户信息的方法
+</code></pre><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div></pre></td><td class="code"><pre><div class="line">- (void)readUserInfo</div><div class="line">&#123;</div><div class="line">    // 保存到偏好设置</div><div class="line">    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];</div><div class="line"></div><div class="line">    // 读取用户名</div><div class="line">    self.usernameTextField.text = [defaults objectForKey:K_username];</div><div class="line"></div><div class="line">    // 读取密码 : 存进去的暗文,读取的也是暗文,读取出暗文之后,需要解密出明文</div><div class="line">    NSString *psd = [defaults objectForKey:K_password];</div><div class="line">    NSString *psd_Decode = [self base64Decode:psd];</div><div class="line"></div><div class="line">    self.passwordTextField.text = psd_Decode;</div><div class="line">&#125;</div><div class="line"></div><div class="line">/// 保存用户信息的主方法</div><div class="line">- (void)saveUserInfo</div><div class="line">&#123;</div><div class="line">    // 保存到偏好设置 : iOS8.0之后就不用调用立即写入的方法 (不安全的保存方式)</div><div class="line">    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];</div><div class="line"></div><div class="line">    // 保存用户名</div><div class="line">    [defaults setObject:self.usernameTextField.text forKey:K_username];</div><div class="line"></div><div class="line">    // 保存密码 : 密码保存到本地之前要加密</div><div class="line">    NSString *psd_encode = [self base64Encode:self.passwordTextField.text];</div><div class="line">    [defaults setObject:psd_encode forKey:K_password];</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<pre><code>加密和解密的方法
+</code></pre><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line"></div><div class="line">- (NSString *)base64Encode:(NSString *)str</div><div class="line">&#123;</div><div class="line">    // 1.把字符串转成二进制</div><div class="line">    NSData *data = [str dataUsingEncoding:NSUTF8StringEncoding];</div><div class="line">    // 2.把二进制进行base64编码,返回编码之后的字符串</div><div class="line">    NSString *encodeStr = [data base64EncodedStringWithOptions:0];</div><div class="line">    // 3.返回编码之后的字符串</div><div class="line">    return encodeStr;</div><div class="line">&#125;</div><div class="line"></div><div class="line">- (NSString *)base64Decode:(NSString *)encodeStr</div><div class="line">&#123;</div><div class="line">    // 1.把编码之后的字符串,解码成二进制</div><div class="line">    NSData *data = [[NSData alloc] initWithBase64EncodedString:encodeStr options:0];</div><div class="line">    // 2.把解码之后的二进制,转成字符串</div><div class="line">    NSString *decodeStr = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];</div><div class="line">    // 3.返回解码之后的字符串</div><div class="line">    return decodeStr;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</blockquote>
+<p>剩下的匹配判断就不挂了，省点空间，那东西加不加密都是不变的</p>
+<blockquote>
+<p>然后该说说MD5加密了。</p>
+</blockquote>
+<pre><code>在我们看来已经足够的加密算法，总还是有大神可以破解的，即便传说的MD5算法，所以后来开始进行加盐，就是明文加盐，MD5计算，这样可能还不安全，还可以把加密结果加盐再进行MD5加密。
+还有的公司设计了自己的加密算法，譬如16位加密，64位加密……当然了，这不是我们的事，而且属于机密问题。
+还有就是这种的算法一般写在分类中。
+</code></pre><h3 id="譬如这样"><a href="#譬如这样" class="headerlink" title="譬如这样"></a>譬如这样</h3><p><img src="Img/3.png" alt=""></p>
+<blockquote>
+<p>继续呢就还有一个钥匙串的加密，这个是🍎独创的。</p>
+</blockquote>
+<pre><code>钥匙串的特点就是自动加密，自动解密，别的不用关心。
+</code></pre><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">//存</div><div class="line">[SSKeychain setPassword:self.passwordTextField.text forService:[NSBundle mainBundle].bundleIdentifier account:self.usernameTextField.text];</div><div class="line"></div><div class="line">//取</div><div class="line">self.passwordTextField.text = [SSKeychain passwordForService:[NSBundle mainBundle].bundleIdentifier account:self.usernameTextField.text];</div></pre></td></tr></table></figure>
+<p>前提是导入个SSKeychain的文件夹，网上可以找得到的<br>温馨提示是：不要把MD5整一堆后放在本地，因为你不能逆向解密。。</p>
 
       
     </div>
